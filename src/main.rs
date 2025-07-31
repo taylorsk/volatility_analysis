@@ -18,11 +18,13 @@ use chrono::{Duration, NaiveDate};
 async fn main() -> Result<(), Box<dyn Error>> {
     let key = "".to_string(); // AlphaVantage API key
     let symbol = "SPY".to_string();
+    //These are the windows. You may want to change the max_options_requests and
+    //fetch_interval_days if you're changing these.
     let hv_window_days = 30;
     let iv_option_target_window_days = 30;
-    let max_options_requests = 24; // Limit for options_data calls, necessary for free
-    let fetch_interval_days = 14; // Fetch options data every 2 weeks, cus cant get every day,
-                                  // good enough
+
+    let max_options_requests = 24; // Limit for options_data calls, necessary for free api
+    let fetch_interval_days = 14; // Fetch options data every 2 weeks, cus cant get every day
 
     let mut ohlcv_data = historical_data(key.clone(), symbol.clone())
         .await

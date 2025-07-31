@@ -1,4 +1,4 @@
-use chrono::{Duration, NaiveDate};
+use chrono::{Datelike, Months, NaiveDate};
 use plotters::prelude::*;
 
 pub fn draw_accuracy_graph(
@@ -23,11 +23,18 @@ pub fn draw_accuracy_graph(
         .last()
         .copied()
         .unwrap_or_else(|| NaiveDate::from_ymd_opt(2024, 1, 1).unwrap());
-    let mut x_axis_weekly_ticks = Vec::new();
+    let mut x_axis_monthly_ticks = Vec::new();
     let mut current_date = min_date;
-    while current_date <= max_date + Duration::days(6) {
-        x_axis_weekly_ticks.push(current_date);
-        current_date += Duration::days(7);
+    while current_date <= max_date {
+        x_axis_monthly_ticks.push(current_date);
+        current_date = match current_date
+            .with_day(1)
+            .unwrap()
+            .checked_add_months(Months::new(1))
+        {
+            Some(date) => date,
+            None => break,
+        };
     }
 
     let all_accuracy_values: Vec<f64> = iv_accuracy_data
@@ -63,7 +70,7 @@ pub fn draw_accuracy_graph(
     chart
         .configure_mesh()
         .x_desc("Date")
-        .x_labels(x_axis_weekly_ticks.len())
+        .x_labels(x_axis_monthly_ticks.len())
         .y_desc("Accuracy Value")
         .y_labels(10)
         .y_label_formatter(&|y| format!("{:.2}", y))
